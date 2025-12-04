@@ -154,9 +154,6 @@ const routes = [
     path: "/book/detail/:id",
     name: "book.detail",
     component: () => import("../views/BookDetail.vue"),
-    meta: {
-      requiresAuth: true
-    },
   },
 ];
 
