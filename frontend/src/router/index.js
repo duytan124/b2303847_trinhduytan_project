@@ -127,6 +127,14 @@ const routes = [
     },
   },
   {
+    path: "/user/add",
+    name: "user.add",
+    component: () => import("../views/staff/UserAdd.vue"),
+    meta: {
+      requiresAuth: true
+    },
+  },
+  {
     path: "/staffs",
     name: "staff.list",
     component: () => import("../views/staff/StaffList.vue"),

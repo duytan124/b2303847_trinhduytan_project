@@ -43,7 +43,7 @@ const handleCreateStaff = handleSubmit(async (values) => {
         <section class="flex-grow mx-16 my-8">
             <form @submit.prevent="handleCreateStaff" class="mt-8">
                 <fieldset class="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4 text-base">
-                    <legend class="fieldset-legend text-xl">Thêm nhân viên</legend>
+                    <legend class="fieldset-legend text-xl">Thêm nhân viên mới</legend>
 
                     <label class="label" for="name">Họ và tên</label>
                     <input v-model="name" type="text" class="input" id="name" placeholder="Nhập họ và tên" />

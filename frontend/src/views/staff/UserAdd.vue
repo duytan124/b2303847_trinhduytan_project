@@ -49,8 +49,7 @@ const handleUserRegister = handleSubmit(async (values) => {
     <div class="min-h-screen bg-gray-50 flex items-center justify-center p-6">
         <div class="max-w-3xl w-full">
             <div class="bg-white rounded-2xl shadow-lg p-8 sm:p-10 border border-gray-100">
-                <h2 class="text-center text-gray-800 text-2xl font-semibold">Đăng ký tài khoản</h2>
-                <p class="text-center text-sm text-gray-500 mt-1 mb-6">Điền thông tin để tạo tài khoản</p>
+                <h2 class="text-center text-gray-800 text-2xl font-semibold">Thêm người dùng mới</h2>
 
                 <form @submit.prevent="handleUserRegister" class="space-y-4">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -122,14 +121,15 @@ const handleUserRegister = handleSubmit(async (values) => {
                     </div>
 
                     <button type="submit"
-                        class="w-full py-3 mt-2 rounded-lg bg-indigo-600 text-white font-medium shadow hover:bg-indigo-700">
-                        Đăng ký
+                        class="btn btn-neutral w-full py-3 mt-4 hover:scale-[1.01] text-base">
+                        Thêm nhân viên
                     </button>
 
-                    <p class="text-center text-sm text-gray-500 mt-4">
-                        Đã có tài khoản?
-                        <router-link to="/login" class="text-blue-600 hover:underline">Đăng nhập ngay</router-link>
-                    </p>
+                    <span class="mt-8">
+                        <strong class="hover:underline">
+                            <RouterLink to="/users" class="text-base">Quay lại</RouterLink>
+                        </strong>
+                    </span>
                 </form>
             </div>
         </div>

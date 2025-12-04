@@ -46,7 +46,7 @@ const searchFilteredUsers = computed(() => {
 });
 
 const goToAddUser = () => {
-    router.push({ name: "register" });
+    router.push({ name: "user.add" });
 };
 
 const handleDeleteAllUsers = async () => {
