@@ -30,7 +30,7 @@ const handleUserRegister = handleSubmit(async (values) => {
     try {
         await userService.register(values);
         push.success("Đăng ký người dùng thành công");
-        router.push("/user/login");
+        router.push("/login");
     } catch (error) {
         console.error(error);
         if (error.response?.status === 400) {
