@@ -86,8 +86,7 @@ onMounted(async () => {
     <div class="min-h-screen bg-gray-50 flex items-center justify-center p-6">
         <div class="max-w-3xl w-full">
             <div class="bg-white rounded-2xl shadow-lg p-8 sm:p-10 border border-gray-100">
-                <h2 class="text-center text-gray-800 text-2xl font-semibold">Đăng ký tài khoản</h2>
-                <p class="text-center text-sm text-gray-500 mt-1 mb-6">Điền thông tin để tạo tài khoản</p>
+                <h2 class="text-center text-gray-800 text-2xl font-semibold">Cập nhật thông tin cá nhân</h2>
 
                 <form @submit.prevent="handleUserRegister" class="space-y-4">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
