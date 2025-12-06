@@ -93,14 +93,8 @@ onMounted(async () => {
                     <label class="label" for="return_date">Ngày trả sách</label>
                     <input v-model="return_date" type="date" class="input" id="return_date" />
                     <span class="text-red-600 text-sm">{{ return_dateError }}</span>
-
-                    <div class="grid grid-cols-2 gap-2">
-                        <button @click=" handleUpdateBorrow(borrowId)"
-                            class="btn btn-neutral mt-4 hover:scale-[1.01] hover:btn-info hover:text-white text-base">Cập
-                            nhật</button>
-                        <button @click=" handleDeleteBorrow(borrowId)"
-                            class="btn btn-neutral mt-4 hover:scale-[1.01] hover:btn-error hover:text-white text-base">Xóa</button>
-                    </div>
+                    <button @click=" handleUpdateBorrow(borrowId)"
+                    class="btn btn-neutral mt-4 hover:scale-[1.01] hover:btn-info hover:text-white text-base">Cập nhật</button>
 
                     <span class="mt-8">
                         <strong class="hover:underline">
