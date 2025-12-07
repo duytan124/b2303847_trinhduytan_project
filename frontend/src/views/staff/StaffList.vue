@@ -13,6 +13,8 @@ const router = useRouter();
 const staffs = ref([]);
 const searchText = ref("");
 const role = computed(() => sessionStorage.getItem("role"));
+const currentStaffId = computed(() => sessionStorage.getItem("id"));
+
 
 const props = defineProps({
     staff: {
@@ -24,7 +26,7 @@ const props = defineProps({
 const fetchStaffs = async () => {
     try {
         const response = await staffService.getAllStaffs();
-        staffs.value = response;
+        staffs.value = response.filter(staff => staff._id !== currentStaffId.value);
     } catch (error) {
         console.error(error);
     }

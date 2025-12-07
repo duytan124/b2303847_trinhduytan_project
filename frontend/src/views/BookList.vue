@@ -19,7 +19,7 @@ const fetchBooks = async () => {
     try {
         const response = await bookService.getAllBooks();
         books.value = response;
-        books.value.sort(() => Math.random() - Math.random());
+        
     } catch (error) {
         console.error(error);
         push.error("Đã có lỗi xảy ra khi hiện thị danh mục sách");
@@ -58,6 +58,9 @@ const handleDeleteAllBooks = async () => {
 
 onMounted(async () => {
     fetchBooks();
+    setInterval(() => {
+        fetchBooks();
+    }, 3000);
 });
 </script>
 

@@ -26,6 +26,9 @@ const fetchBorrows = async () => {
         borrows.value = response;
         const now = new Date();
         now.setHours(0, 0, 0, 0);
+        borrows.value = response.sort((a, b) => {
+            return new Date(b.createdAt) - new Date(a.createdAt);
+        });
         for (const borrow of borrows.value) {
             const returnDate = new Date(borrow.return_date).setHours(0, 0, 0, 0);
             if ((now > returnDate && borrow.status !== "returned" && borrow.status !== "rejected")) {
@@ -126,7 +129,9 @@ onMounted(async () => {
         router.push("/");
     }
     fetchBorrows();
-    fetchBorrows();
+    setInterval(() => {
+        fetchBorrows();
+    }, 3000);
 });
 </script>
 

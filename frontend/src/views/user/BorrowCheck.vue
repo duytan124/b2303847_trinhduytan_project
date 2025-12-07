@@ -85,7 +85,9 @@ const filteredBorrows = computed(() => {
 
 onMounted(async () => {
     fetchBorrows();
-    fetchBorrows();
+    setInterval(() => {
+        fetchBorrows();
+    }, 3000);
 });
 </script>
 
