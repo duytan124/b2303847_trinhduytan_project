@@ -20,9 +20,9 @@ const fetchBorrows = async () => {
         borrows.value = response.filter(borrow => borrow.user_id?._id === id.value);
         const now = new Date();
         now.setHours(0, 0, 0, 0);
-        books.value = response.sort((a, b) =>
-            a.title.localeCompare(b.title, "vi", { sensitivity: "base" })
-        );
+        borrows.value = response.sort((a, b) => {
+            return new Date(b.createdAt) - new Date(a.createdAt);
+        });
         for (const borrow of borrows.value) {
             const returnDate = new Date(borrow.return_date).setHours(0, 0, 0, 0);
             if ((now > returnDate && borrow.status !== "returned" && borrow.status !== "rejected")) {
