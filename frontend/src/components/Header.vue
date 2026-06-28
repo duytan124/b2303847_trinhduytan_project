@@ -63,7 +63,7 @@ const role = ref(sessionStorage.getItem("role"));
                                 <RouterLink to="/borrowcheck" class="text-base"
                                     exact-active-class="text-base font-bold transition-all duration-200 ease-in-out">
                                     Kiểm tra đơn mượn
-                                    </RouterLink>
+                                    sách</RouterLink>
                             </li>
                         </template>
                     </ul>
@@ -80,8 +80,7 @@ const role = ref(sessionStorage.getItem("role"));
                     <li>
                         <RouterLink to="/" class="text-base hover:font-bold hover:underline"
                             exact-active-class="text-base font-bold transition-all duration-200 ease-in-out">
-                            Danh mục sách
-                        </RouterLink>
+                            Danh mục sách</RouterLink>
                     </li>
                     <li>
                         <RouterLink to="/borrowpending" class="text-base hover:font-bold hover:underline"
@@ -114,7 +113,7 @@ const role = ref(sessionStorage.getItem("role"));
                     <li>
                         <RouterLink to="/borrowcheck" class="text-base hover:font-bold hover:underline"
                             exact-active-class="text-base font-bold transition-all duration-200 ease-in-out">
-                            Kiểm tra đơn mượn sách</RouterLink>
+                            Kiểm tra đơn mượn </RouterLink>
                     </li>
                 </template>
             </ul>
