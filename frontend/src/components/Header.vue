@@ -63,7 +63,7 @@ const role = ref(sessionStorage.getItem("role"));
                                 <RouterLink to="/borrowcheck" class="text-base"
                                     exact-active-class="text-base font-bold transition-all duration-200 ease-in-out">
                                     Kiểm tra đơn mượn
-                                    </RouterLink>
+                                    sách</RouterLink>
                             </li>
                         </template>
                     </ul>
