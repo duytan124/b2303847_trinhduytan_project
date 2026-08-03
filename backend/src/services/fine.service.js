@@ -44,19 +44,22 @@ class FineService {
                         amount: fineAmount,
                         status: "unpaid"
                     });
+                    await fine.save();
                 } else if (fine.status === "unpaid") {
+                    // Chỉ cập nhật nếu khoản phạt CHƯA thanh toán
                     fine.late_days = lateDays;
                     fine.overdue_days = lateDays;
                     fine.fine_amount = fineAmount;
                     fine.amount = fineAmount;
+                    await fine.save();
                 }
 
-                await fine.save();
-
-                // Cập nhật trạng thái phiếu mượn
-                borrow.status = "overdue";
-                borrow.fine_id = fine._id;
-                await borrow.save();
+                // Cập nhật trạng thái phiếu mượn (chỉ khi chưa nộp phạt)
+                if (fine.status === "unpaid") {
+                    borrow.status = "overdue";
+                    borrow.fine_id = fine._id;
+                    await borrow.save();
+                }
 
                 updatedCount++;
             }
@@ -94,12 +97,11 @@ class FineService {
             { totalPaidAmount: 0, totalUnpaidAmount: 0, paidCount: 0, unpaidCount: 0 }
         );
 
-        // Lọc danh sách phạt chưa thanh toán
-        const unpaidFines = allFines.filter(fine => fine.status === "unpaid");
-
+        // 🟢 ĐÃ SỬA: Trả về TOÀN BỘ danh sách phạt (cả paid và unpaid)
+        // để giao diện hiển thị được badge "Đã thanh toán" / "Chưa thanh toán"
         return {
             stats,
-            fines: unpaidFines
+            fines: allFines
         };
     }
 
@@ -111,7 +113,7 @@ class FineService {
     }
 
     /**
-     * 4. Xử lý gạch nợ TỰ ĐỘNG thông qua Webhook (SePay / Postman)
+     * 4. Xử lý gạch nợ TỰ ĐỘNG thông qua Webhook (SePay / VietQR)
      */
     async processWebhookPayment(borrowId, transactionData = {}) {
         // 1. Kiểm tra sự tồn tại của phiếu mượn
@@ -120,7 +122,7 @@ class FineService {
             throw new ApiError(404, `Không tìm thấy phiếu mượn với ID: ${borrowId}`);
         }
 
-        // 2. Tìm khoản phạt gắn với phiếu mượn
+        // 2. Tìm hoặc tạo mới khoản phạt
         let fine = await Fine.findOne({ borrow_id: borrowId });
 
         if (!fine) {
@@ -142,7 +144,7 @@ class FineService {
         }
         await fine.save();
 
-        // 3. Cập nhật phiếu mượn sang trạng thái 'return_pending' (Chờ duyệt trả)
+        // 3. Cập nhật phiếu mượn sang trạng thái 'return_pending' (Chờ thủ thư duyệt nhận lại sách)
         borrow.status = "return_pending";
         borrow.fine_id = fine._id;
         await borrow.save();
