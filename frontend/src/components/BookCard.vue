@@ -28,20 +28,20 @@ const goToEditBook = (book_id) => {
 };
 
 const goToLogin = () => {
-    push.info("Vui lòng đăng nhập trước khi mượn sách!!")
+    push.info("Vui lòng đăng nhập trước khi mượn sách!!");
     router.push('/login');
-}
+};
 
 const goToBookDetail = (book_id) => {
-    router.push({ name: "book.detail", params: { id: book_id } })
-}
-
+    router.push({ name: "book.detail", params: { id: book_id } });
+};
 </script>
 
 <template>
     <div
-        class="flex flex-col bg-white rounded-xl shadow-md overflow-hidden transition-transform transform md:hover:shadow-xl">
+        class="flex flex-col bg-white rounded-xl shadow-md overflow-hidden transition-transform transform md:hover:shadow-xl border border-gray-100">
 
+        <!-- Ảnh bìa sách -->
         <div class="relative h-48 w-full bg-gray-100">
             <div v-if="loading" class="absolute inset-0 animate-pulse bg-gray-200"></div>
             <img :src="`https://picsum.photos/seed/${encodeURIComponent(props.book?.title)}/800`" alt="Book cover"
@@ -49,23 +49,34 @@ const goToBookDetail = (book_id) => {
                 :class="['h-full w-full object-cover transition-opacity duration-300', loading ? 'opacity-0' : 'opacity-100']" />
         </div>
 
+        <!-- Thông tin sách -->
         <div class="p-4 flex-1 flex flex-col justify-between">
-            <div class="space-y-2">
-                <h3 class="text-lg font-semibold text-gray-900 truncate">{{ props.book?.title || "Không xác định" }}
+            <div class="space-y-1.5">
+                <h3 class="text-lg font-semibold text-gray-900 truncate" :title="props.book?.title">
+                    {{ props.book?.title || "Không xác định" }}
                 </h3>
-                <p class="text-sm text-gray-500 truncate">thể loại: {{ props.book?.genre || "Không xác định" }}</p>
-                <p class="text-sm mb-1 text-gray-600 truncate">tác giả: {{ props.book?.author || "Không xác định" }}</p>
+                <p class="text-sm text-gray-500 truncate">Thể loại: {{ props.book?.genre || "Không xác định" }}</p>
+                <p class="text-sm text-gray-600 truncate">Tác giả: {{ props.book?.author || "Không xác định" }}</p>
+
+                <!-- 📌 Bổ sung thông tin Hạn mượn tối đa theo quy định nghiệp vụ -->
+                <p class="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded inline-block font-medium">
+                    ⏱️ Hạn trả: Tối đa 5 ngày kể từ ngày mượn
+                </p>
             </div>
-            <div>
+
+            <!-- Tình trạng kho -->
+            <div class="mt-3">
                 <template v-if="props.book?.quantity >= 1">
-                    <dd class="text-emerald-600 font-bold sm:col-span-2 truncate">còn {{ props.book?.quantity || "Không xác định" }} quyển sách
+                    <dd class="text-emerald-600 font-bold sm:col-span-2 truncate">
+                        Còn {{ props.book?.quantity }} quyển sách
                     </dd>
                 </template>
                 <template v-else>
-                    <dd class="text-stone-600 font-bold sm:col-span-2 truncate">Đã hết sách</dd>
+                    <dd class="text-rose-600 font-bold sm:col-span-2 truncate">Đã hết sách</dd>
                 </template>
             </div>
 
+            <!-- Các nút hành động -->
             <div class="mt-4 flex flex-wrap gap-2">
                 <button v-if="role === 'staff'" @click="goToEditBook(props.book?._id)"
                     class="flex-1 min-w-[120px] py-2 px-4 rounded-lg bg-blue-500 text-white font-medium hover:bg-blue-600 transition">
@@ -83,7 +94,7 @@ const goToBookDetail = (book_id) => {
                     class="flex-1 min-w-[120px] py-2 px-4 rounded-lg bg-gray-400 text-white font-medium hover:bg-gray-500 transition">
                     Xem chi tiết
                 </button>
-            </div>  
+            </div>
         </div>
     </div>
 </template>

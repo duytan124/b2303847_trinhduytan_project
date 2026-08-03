@@ -1,5 +1,30 @@
 <script setup>
+import { watch } from 'vue';
+
+// 1. v-model 2 chiều để liên kết văn bản hiển thị tức thì trên màn hình
 const searchText = defineModel();
+
+// 2. Định nghĩa emit sự kiện 'search' trả từ khóa đã debounce ra ngoài cho API Redis
+const emit = defineEmits(['search']);
+
+// Hàm Debounce tự dựng
+function debounce(fn, delay = 400) {
+    let timer;
+    return (...args) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => fn(...args), delay);
+    };
+}
+
+// Trì hoãn gửi sự kiện tìm kiếm
+const debouncedEmitSearch = debounce((val) => {
+    emit('search', val);
+}, 400);
+
+// Theo dõi thay đổi của v-model để tự động kích hoạt Debounce
+watch(searchText, (newVal) => {
+    debouncedEmitSearch(newVal);
+});
 </script>
 
 <template>
@@ -10,6 +35,7 @@ const searchText = defineModel();
                 <path d="m21 21-4.3-4.3"></path>
             </g>
         </svg>
-        <input v-model="searchText" type="search" placeholder="Nhập từ khóa để tìm kiếm" />
+        <input v-model="searchText" type="search" placeholder="Nhập từ khóa để tìm kiếm..."
+            @keydown.enter="emit('search', searchText)" />
     </label>
 </template>

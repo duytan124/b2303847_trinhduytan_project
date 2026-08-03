@@ -15,17 +15,18 @@ const role = computed(() => sessionStorage.getItem("role"));
 const books = ref([]);
 const searchText = ref("");
 
-const fetchBooks = async () => {
+// Nhận tham số query từ sự kiện @search của InputSearch phát ra
+const fetchBooks = async (query = searchText.value) => {
     try {
-        const response = await bookService.getAllBooks();
-        books.value = response;
-        
+        const response = await bookService.getAllBooks(query);
+        books.value = response || [];
     } catch (error) {
         console.error(error);
-        push.error("Đã có lỗi xảy ra khi hiện thị danh mục sách");
+        push.error("Đã có lỗi xảy ra khi hiển thị danh mục sách");
     }
 };
 
+// Lọc bổ sung ở Client cho trải nghiệm phản hồi tức thì
 const searchFilteredBooks = computed(() => {
     if (!searchText.value) return books.value;
     const keyword = searchText.value.toLowerCase();
@@ -56,11 +57,9 @@ const handleDeleteAllBooks = async () => {
     }
 };
 
-onMounted(async () => {
+onMounted(() => {
     fetchBooks();
-    setInterval(() => {
-        fetchBooks();
-    }, 3000);
+    // Đã loại bỏ setInterval 3 giây để tối ưu hiệu năng Redis Cache ở Backend
 });
 </script>
 
@@ -71,7 +70,7 @@ onMounted(async () => {
             <div class="grid grid-cols-1 gap-4 lg:gap-8">
                 <div class="flex flex-col sm:flex-row gap-2 justify-center">
                     <div class="tooltip" data-tip="Tựa sách, thể loại, tác giả">
-                        <InputSearch class="w-full" v-model="searchText"></InputSearch>
+                        <InputSearch class="w-full" v-model="searchText" @search="fetchBooks"></InputSearch>
                     </div>
 
                     <template v-if="role === 'staff'">
