@@ -17,21 +17,53 @@ const router = useRouter();
 
 const user_id = computed(() => sessionStorage.getItem("id"));
 const book_id = route.params.id;
-const book = ref([]);
+const book = ref({});
 const quantity = ref(1);
+
+// 📌 1. Hàm format hiển thị ngày/tháng/năm (DD/MM/YYYY) cho giao diện
+const formatDateVN = (date) => {
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+};
+
+// 📌 2. Hàm format YYYY-MM-DD chuẩn để gửi lên Backend
+const formatDateISO = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+};
+
+// 📌 Tự động tính Ngày mượn (Hôm nay) và Hạn trả (+5 ngày)
+const today = new Date();
+const borrow_date_iso = formatDateISO(today);
+const borrow_date_vn = formatDateVN(today);
+
+const futureDate = new Date();
+futureDate.setDate(today.getDate() + 5);
+const due_date_iso = formatDateISO(futureDate);
+const due_date_vn = formatDateVN(futureDate);
 
 const { handleSubmit } = useForm({
     validationSchema: borrowSchema,
+    initialValues: {
+        due_date: due_date_iso // Khởi tạo ISO cho VeeValidate
+    }
 });
 
-const { value: return_date, errorMessage: return_dateError } = useField("return_date");
+const { value: due_date } = useField("due_date", undefined, {
+    initialValue: due_date_iso
+});
 
 const handleCreateBorrow = handleSubmit(async () => {
     try {
         const data = {
             user_id: user_id.value,
             book_id: book_id,
-            return_date: return_date.value,
+            borrow_date: borrow_date_iso,
+            due_date: due_date.value, // Gửi YYYY-MM-DD lên Backend
             quantity: quantity.value
         };
 
@@ -40,10 +72,10 @@ const handleCreateBorrow = handleSubmit(async () => {
         router.push("/");
     } catch (error) {
         console.log(error);
-        if (error.response.status === 422) {
+        if (error.response?.status === 422) {
             push.warning("Bạn đang mượn cuốn này và chưa trả");
         }
-        else if (error.response.status === 409) {
+        else if (error.response?.status === 409) {
             push.warning("Bạn chỉ có thể mượn tối đa 3 quyển sách");
         }
         else {
@@ -51,7 +83,6 @@ const handleCreateBorrow = handleSubmit(async () => {
         }
     }
 });
-
 
 onMounted(async () => {
     try {
@@ -83,16 +114,17 @@ onMounted(async () => {
                     <label class="label" for="quantity">Số quyển</label>
                     <input v-model="quantity" type="number" class="input" id="quantity" readonly value="1" />
 
+                    <!-- Ngày mượn (Hiển thị dd/mm/yyyy) -->
                     <label class="label" for="borrow_date">Ngày mượn</label>
-                    <input type="date" class="input" id="borrow_date" readonly
-                        :value="new Date().toISOString().slice(0, 10)">
+                    <input type="text" class="input" id="borrow_date" readonly :value="borrow_date_vn">
 
-                    <label class="label" for="return_date">Ngày trả sách</label>
-                    <input v-model="return_date" type="date" class="input" id="return_date" />
-                    <span class="text-red-600 text-sm">{{ return_dateError }}</span>
+                    <label class="label" for="due_date">Hạn trả sách chậm nhất</label>
+                    <input type="text" class="input bg-gray-100 font-semibold text-blue-600" id="due_date" readonly
+                        :value="due_date_vn" />
 
-                    <button type="submit" class="btn btn-neutral mt-4 hover:scale-[1.01] text-base">Thêm phiếu
-                        mượn</button>
+                    <button type="submit" class="btn btn-neutral mt-4 hover:scale-[1.01] text-base">
+                        Thêm phiếu mượn
+                    </button>
 
                     <span class="mt-8">
                         <strong class="hover:underline">

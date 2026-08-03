@@ -3,8 +3,9 @@ import Header from "../../components/Header.vue";
 import Footer from "../../components/Footer.vue";
 import InputSearch from "../../components/InputSearch.vue";
 import BorrowCard from "../../components/BorrowCard.vue";
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import BorrowService from "../../services/borrow.service";
+
 const borrowService = new BorrowService();
 
 const id = computed(() => sessionStorage.getItem("id"));
@@ -14,23 +15,26 @@ const searchText = ref("");
 const filteredStatus = ref("");
 const filteredStatusText = ref("");
 
+let timerId = null;
+
 const fetchBorrows = async () => {
     try {
         const response = await borrowService.getAllBorrows();
-        borrows.value = response.filter(borrow => borrow.user_id?._id === id.value);
-        const now = new Date();
-        now.setHours(0, 0, 0, 0);
-        borrows.value = response.sort((a, b) => {
-            return new Date(b.createdAt) - new Date(a.createdAt);
+
+        // 1. Lọc chuẩn xác đơn mượn của User hiện tại
+        const myBorrows = response.filter(borrow => {
+            const userIdInBorrow = borrow.user_id?._id || borrow.user_id;
+            return String(userIdInBorrow) === String(id.value);
         });
-        for (const borrow of borrows.value) {
-            const returnDate = new Date(borrow.return_date).setHours(0, 0, 0, 0);
-            if ((now > returnDate && borrow.status !== "returned" && borrow.status !== "rejected")) {
-                await borrowService.updateBorrow(borrow._id, { status: "overdue" });
-            }
-        };
+
+        // 2. Sắp xếp đơn mới nhất lên đầu
+        myBorrows.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+        // 3. Cập nhật dữ liệu hiển thị
+        borrows.value = myBorrows;
+
     } catch (error) {
-        console.error(error);
+        console.error("Lỗi khi tải danh sách đơn mượn:", error);
     }
 };
 
@@ -55,7 +59,6 @@ const handleFilterStatus = (status) => {
         case "overdue":
             filteredStatusText.value = "Quá hạn";
             break;
-
         default:
             filteredStatusText.value = "Tất cả sách";
             break;
@@ -66,14 +69,12 @@ const filteredBorrows = computed(() => {
     let result = borrows.value;
 
     if (filteredStatus.value) {
-        return result.filter(borrow => borrow.status === filteredStatus.value);
+        result = result.filter(borrow => borrow.status === filteredStatus.value);
     }
 
-    if (searchText.value) {
-
-        const keyword = searchText.value.toLowerCase();
-
-        return borrows.value.filter(borrow => {
+    if (searchText.value.trim()) {
+        const keyword = searchText.value.toLowerCase().trim();
+        result = result.filter(borrow => {
             const searchableText = [borrow.book_id?.title]
                 .filter(Boolean)
                 .join(' ')
@@ -83,14 +84,29 @@ const filteredBorrows = computed(() => {
         });
     }
 
-    return borrows.value;
+    return result;
 });
 
-onMounted(async () => {
-    fetchBorrows();
-    setInterval(() => {
+// 📌 Khi BorrowCard mở Modal thanh toán, tăng tốc độ Polling kiểm tra trạng thái lên 2 giây/lần
+const handleRequirePayment = () => {
+    if (timerId) clearInterval(timerId);
+    timerId = setInterval(() => {
         fetchBorrows();
-    }, 3000);
+    }, 2000);
+};
+
+onMounted(() => {
+    fetchBorrows();
+    // Mặc định làm mới danh sách mỗi 10 giây
+    timerId = setInterval(() => {
+        fetchBorrows();
+    }, 10000);
+});
+
+onUnmounted(() => {
+    if (timerId) {
+        clearInterval(timerId);
+    }
 });
 </script>
 
@@ -103,9 +119,10 @@ onMounted(async () => {
                 <div class="tooltip" data-tip="Tựa sách">
                     <InputSearch class="w-full" v-model="searchText"></InputSearch>
                 </div>
+
                 <div class="dropdown dropdown-center flex justify-center">
-                    <div tabindex="0" role="button" class="btn bg-base-100 hover:bg-base-300">{{ filteredStatusText ||
-                        "Tất cả sách" }}
+                    <div tabindex="0" role="button" class="btn bg-base-100 hover:bg-base-300">
+                        {{ filteredStatusText || "Tất cả sách" }}
                     </div>
                     <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm">
                         <li><a @click="handleFilterStatus('')">Tất cả sách</a></li>
@@ -119,19 +136,22 @@ onMounted(async () => {
                 </div>
 
             </div>
+
             <template v-if="filteredBorrows.length > 0">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-8">
                     <BorrowCard v-for="borrow in filteredBorrows" :key="borrow._id" :borrow="borrow"
-                        @fetchBorrows="fetchBorrows">
+                        @fetchBorrows="fetchBorrows" @requirePayment="handleRequirePayment">
                     </BorrowCard>
                 </div>
             </template>
+
             <template v-else>
                 <div class="grid grid-cols-1 text-center">
-                    <p class="py-6 font-bold">Hiện tại chưa có đơn mượn sách</p>
+                    <p class="py-6 font-bold text-gray-500">Hiện tại chưa có đơn mượn sách</p>
                 </div>
             </template>
         </div>
+
         <Footer></Footer>
     </div>
 </template>
