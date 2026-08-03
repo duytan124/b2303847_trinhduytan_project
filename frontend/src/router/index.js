@@ -155,8 +155,12 @@ const routes = [
     name: "book.detail",
     component: () => import("../views/BookDetail.vue"),
   },
+  {
+    path: '/fine-report',
+    name: 'fine.report',
+    component: () => import("../views/staff/FineReportView.vue"),
+  },
 ];
-
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,

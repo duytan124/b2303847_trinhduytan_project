@@ -51,6 +51,12 @@ const role = ref(sessionStorage.getItem("role"));
                                     Nhân viên
                                 </RouterLink>
                             </li>
+                            <li>
+                                <RouterLink to="/fine-report" class="text-base"
+                                    exact-active-class="text-base font-bold transition-all duration-200 ease-in-out">
+                                    Báo cáo phí phạt
+                                </RouterLink>
+                            </li>
                         </template>
                         <template v-if="role === 'user'">
                             <li>
@@ -102,6 +108,11 @@ const role = ref(sessionStorage.getItem("role"));
                         <RouterLink to="/staffs" class="text-base hover:font-bold hover:underline"
                             exact-active-class="text-base font-bold transition-all duration-200 ease-in-out">
                             Nhân viên</RouterLink>
+                    </li>
+                    <li>
+                        <RouterLink to="/fine-report" class="text-base hover:font-bold hover:underline"
+                            exact-active-class="text-base font-bold transition-all duration-200 ease-in-out">
+                            Báo cáo phí phạt</RouterLink>
                     </li>
                 </template>
 

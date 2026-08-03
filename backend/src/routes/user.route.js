@@ -7,6 +7,9 @@ const router = express.Router();
 router.post("/login", UserController.login);
 router.post("/register", UserController.create);
 
+// [THÊM MỚI] Route xử lý đăng nhập bằng Google OAuth2 (REQ_ADA_01)
+router.post("/google-login", UserController.googleLogin);
+
 router.route("/")
     .post(UserController.create)
     .get(auth, UserController.findAll)
